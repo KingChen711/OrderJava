@@ -25,18 +25,23 @@ final public class ProductManagement {
   private ArrayList<Product> productList = readProductList();
 
   public void listAllProducts() {
-
     productList.forEach(product -> {
       System.out.println(product.toString());
     });
-
   }
 
-  public ArrayList<Product> readProductList() {
+  public ArrayList<String> getProductIds() {
+    ArrayList<String> results = new ArrayList<>();
+    productList.forEach(product -> results.add(product.getId()));
+    return results;
+  }
+
+  private ArrayList<Product> readProductList() {
     ArrayList<Product> products = new ArrayList<>();
     try {
-      File file = new File("../resources/products.txt");
-      System.out.println(file.getAbsolutePath());
+
+      ClassLoader classLoader = ProductManagement.class.getClassLoader();
+      File file = new File(classLoader.getResource("resources/products.txt").getFile());
       FileReader fr = new FileReader(file);
       BufferedReader br = new BufferedReader(fr);
       String line;

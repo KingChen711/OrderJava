@@ -52,20 +52,19 @@ public class Customer {
   }
 
   public void input() {
-    id = ValidInput.inputId("customer's id", "not empty,unique,format: \"Bxxxxx\"",
-        CustomerManagement.getInstance().checkUniqueId);
+    id = ValidInput.inputId("customer's id", "not empty,unique", CustomerManagement.getInstance().checkUniqueId);
     update();
   }
 
   public void update() {
     name = ValidInput.inputString("customer's name");
     address = ValidInput.inputString("customer's address");
-    phone = ValidInput.inputString("customer's phone");
+    phone = ValidInput.inputStringLength("customer's phone", 10, 12);
   }
 
   @Override
   public String toString() {
-    return "Customer [id=" + id + ", name=" + name + ", address=" + address + ", phone=" + phone + "]";
+    return id + "," + name + "," + address + "," + phone;
   }
 
 }

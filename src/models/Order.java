@@ -1,20 +1,21 @@
 package models;
 
+import lists.OrderManagement;
+import utils.Menu;
+import utils.ValidInput;
 
 public class Order {
   private String id;
   private String customerId;
   private String productId;
-  private String quantity;
+  private int quantity;
   private String date;
   private boolean status;
-
-  
 
   public Order() {
   }
 
-  public Order(String id, String customerId, String productId, String quantity, String date, boolean status) {
+  public Order(String id, String customerId, String productId, int quantity, String date, boolean status) {
     this.id = id;
     this.customerId = customerId;
     this.productId = productId;
@@ -47,11 +48,11 @@ public class Order {
     this.productId = productId;
   }
 
-  public String getQuantity() {
+  public int getQuantity() {
     return quantity;
   }
 
-  public void setQuantity(String quantity) {
+  public void setQuantity(int quantity) {
     this.quantity = quantity;
   }
 
@@ -63,7 +64,7 @@ public class Order {
     this.date = date;
   }
 
-  public boolean isStatus() {
+  public boolean getStatus() {
     return status;
   }
 
@@ -71,10 +72,23 @@ public class Order {
     this.status = status;
   }
 
+  public void input() {
+    id = ValidInput.inputId("order's id", "not empty, unique", OrderManagement.getInstance().checkUniqueId);
+    update();
+  }
+
+  public void update() {
+    customerId = Menu.getChosenCustomerId();
+    productId = Menu.getChosenProductId();
+    quantity = ValidInput.inputPositiveInteger("order's quantity");
+    date = ValidInput.inputString("order's date");
+    status = ValidInput.inputBoolean("order's status");
+  }
+
   @Override
   public String toString() {
-    return "Order [id=" + id + ", customerId=" + customerId + ", productId=" + productId + ", quantity=" + quantity
-        + ", date=" + date + ", status=" + status + "]";
+    return id + "," + customerId + "," + productId + "," + quantity
+        + "," + date + "," + status;
   }
 
 }

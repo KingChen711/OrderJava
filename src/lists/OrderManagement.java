@@ -1,11 +1,20 @@
 package lists;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import models.Order;
+import utils.Menu;
+import utils.ValidInput;
+import utils.Verify;
 
 final public class OrderManagement {
 
@@ -22,12 +31,129 @@ final public class OrderManagement {
     return instance;
   }
 
-  private ArrayList<Order> OrderList = readOrderList();
+  private ArrayList<Order> orderList = readOrderList();
 
-  public ArrayList<Order> readOrderList() {
+  public void printAllOrders() {
+    Collections.sort(orderList, new CustomerNameComparator());
+    orderList.forEach(order -> {
+      System.out.println(order.toString());
+    });
+  }
+
+  public void printAllPendingOrders() {
+    orderList.forEach(order -> {
+      if (!order.getStatus())
+        System.out.println(order.toString());
+    });
+  }
+
+  public void addOrder() {
+
+    if (!Verify.isAdmin())
+      return;
+
+    while (true) {
+      Order newOrder = new Order();
+      newOrder.input();
+      orderList.add(newOrder);
+      System.out.println("\nCreate new order successfully!\n");
+
+      System.out.println("Do you want to add one more order?");
+      String confirm = Menu.getConfirm();
+      if (confirm == "no")
+        break;
+    }
+  }
+
+  public void updateOrder() {
+
+    if (!Verify.isAdmin())
+      return;
+
+    String optionUpdate = Menu.getOptionUpdateOrder();
+    String searchedId = ValidInput.inputString("order's id");
+    Order foundOrder = findById(searchedId);
+
+    if (foundOrder == null) {
+      System.out.println("\nFail: Customer’s id does not exist\n");
+      return;
+    }
+
+    if (optionUpdate == "delete") {
+      String confirm = Menu.getConfirm();
+      if (confirm == "yes") {
+        orderList.remove(foundOrder);
+        System.out.println("\nSuccess: Delete order successfully!\n");
+      } else {
+        System.out.println("\nFail: Delete order fail!\n");
+        System.out.println("\nYou have refuse to delete order\n");
+      }
+    } else {
+      foundOrder.update();
+      System.out.println("\nSuccess: Update order information successfully!\n");
+    }
+  }
+
+  public void saveOrderList() {
+
+    if (!Verify.isAdmin())
+      return;
+
+    try {
+      ClassLoader classLoader = ProductManagement.class.getClassLoader();
+      File file = new File(classLoader.getResource("resources/orders.txt").getFile());
+      FileWriter fw = new FileWriter(file);
+      BufferedWriter bw = new BufferedWriter(fw);
+
+      for (Order order : orderList) {
+        bw.write(order.toString());
+        bw.newLine();
+      }
+
+      bw.close();
+      fw.close();
+    } catch (IOException e) {
+      System.out.println("\nFail: Save Order list fail!\n");
+      System.out.println(e);
+    }
+    System.out.println("\nSuccess: Save Order list successfully!\n");
+  }
+
+  public Order findById(String id) {
+    Order foundOrder = null;
+    for (Order order : orderList) {
+      if (order.getId().equals(id)) {
+        foundOrder = order;
+        break;
+      }
+    }
+    return foundOrder;
+  }
+
+  private static class CustomerNameComparator implements Comparator<Order> {
+
+    @Override
+    public int compare(Order order1, Order order2) {
+      HashMap<String, String> customerIdToName = CustomerManagement.getInstance().getMapIdToName();
+      String customerName1 = customerIdToName.get(order1.getCustomerId());
+      String customerName2 = customerIdToName.get(order2.getCustomerId());
+      return customerName1.compareTo(customerName2);
+    }
+  }
+
+  public ValidInput.CheckUnique checkUniqueId = new ValidInput.CheckUnique() {
+    @Override
+    public boolean check(String checkedId) {
+      return !orderList.stream().anyMatch(order -> order.getId().equals(checkedId));
+    }
+  };
+
+  private ArrayList<Order> readOrderList() {
     ArrayList<Order> orders = new ArrayList<>();
     try {
-      FileReader fr = new FileReader("OrderList.txt");
+      ClassLoader classLoader = ProductManagement.class.getClassLoader();
+      File file = new File(classLoader.getResource("resources/orders.txt").getFile());
+      FileReader fr = new FileReader(file);
       BufferedReader br = new BufferedReader(fr);
       String line;
 
@@ -41,7 +167,7 @@ final public class OrderManagement {
         newOrder.setId(texts[0]);
         newOrder.setCustomerId(texts[1]);
         newOrder.setProductId(texts[2]);
-        newOrder.setQuantity(texts[3]);
+        newOrder.setQuantity(Integer.parseInt(texts[3]));
         newOrder.setDate((texts[4]));
         newOrder.setStatus(Boolean.parseBoolean(texts[5]));
         orders.add(newOrder);
