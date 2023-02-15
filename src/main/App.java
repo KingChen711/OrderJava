@@ -1,3 +1,5 @@
+package main;
+
 import lists.CustomerManagement;
 import lists.OrderManagement;
 import lists.ProductManagement;
@@ -12,7 +14,7 @@ public class App {
         OrderManagement orderManagement = OrderManagement.getInstance();
         boolean ext = false;
         do {
-            int choice = Menu.getAdminChoice();
+            int choice = Menu.getMainChoice();
             switch (choice) {
                 case 1:
                     productManagement.listAllProducts();
@@ -47,7 +49,7 @@ public class App {
                 case 11:
                     orderManagement.saveOrderList();
                     break;
-                case 12:
+                default:
                     ext = true;
                     break;
             }

@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import models.Product;
+import java.util.List;
 
-final public class ProductManagement {
+import models.Product;
+import utils.Pause;
+
+public final class ProductManagement {
 
   private static ProductManagement instance;
 
@@ -22,26 +25,26 @@ final public class ProductManagement {
     return instance;
   }
 
-  private ArrayList<Product> productList = readProductList();
+  private List<Product> productList = readProductList();
 
   public void listAllProducts() {
-    productList.forEach(product -> {
-      System.out.println(product.toString());
-    });
+    productList.forEach(product -> System.out.println(product.toString()));
+
+    Pause.pause();
   }
 
-  public ArrayList<String> getProductIds() {
-    ArrayList<String> results = new ArrayList<>();
+  public List<String> getProductIds() {
+    List<String> results = new ArrayList<>();
     productList.forEach(product -> results.add(product.getId()));
     return results;
   }
 
-  private ArrayList<Product> readProductList() {
-    ArrayList<Product> products = new ArrayList<>();
+  private List<Product> readProductList() {
+    List<Product> products = new ArrayList<>();
     try {
 
-      ClassLoader classLoader = ProductManagement.class.getClassLoader();
-      File file = new File(classLoader.getResource("resources/products.txt").getFile());
+      String currentWorkingDirectory = System.getProperty("user.dir");
+      File file = new File(currentWorkingDirectory + "/src/resources/products.txt");
       FileReader fr = new FileReader(file);
       BufferedReader br = new BufferedReader(fr);
       String line;

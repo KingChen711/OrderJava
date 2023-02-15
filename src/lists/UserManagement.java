@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import models.User;
 import utils.ValidInput;
 
-final public class UserManagement {
+public final class UserManagement {
 
   private static UserManagement instance;
 
@@ -36,7 +36,7 @@ final public class UserManagement {
 
       for (User user : userList) {
         if (username.equals(user.getId()) && password.equals(user.getPassword())) {
-          System.out.println("\nSuccess: login successful");
+          System.out.println("\nSuccess: login successful\n");
           return user;
         }
       }
